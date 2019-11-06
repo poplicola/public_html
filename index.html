@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>One Page Wonder - Start Bootstrap Template</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom fonts for this template -->
+  <link href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/one-page-wonder.css" rel="stylesheet">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Graphs for HCI 511!</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Graph 1</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="graph2.html">Graph 2</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="graph3.html">Graph 3</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section>
+    <div class="container" style="margin-top: 2em;">
+      <div class="row align-items-center">
+        <div class="col-lg-6 order-lg-2">
+          <div class="p-5 chart1">
+		  	
+	        <script>
+
+				// 2. Use the margin convention practice 
+				var default_width = 480;
+				var default_height = 250;
+				var margin = {top: 50, right: 50, bottom: 50, left: 50}
+				  , width = default_width - margin.left - margin.right // Use the window's width 
+				  , height = default_height - margin.top - margin.bottom; // Use the window's height
+				
+				// The number of datapoints
+				var n = 21;
+				
+				// 5. X scale will use the index of our data
+				var xScale = d3.scaleLinear()
+				    .domain([0, n-1]) // input
+				    .range([0, width]); // output
+				
+				// 6. Y scale will use the randomly generate number 
+				var yScale = d3.scaleLinear()
+				    .domain([0, 1]) // input 
+				    .range([height, 0]); // output 
+				
+				// 7. d3's line generator
+				var line = d3.line()
+				    .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+				    .y(function(d) { return yScale(d.y); }) // set the y values for the line generator 
+				    .curve(d3.curveMonotoneX) // apply smoothing to the line
+				
+				// 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
+				var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
+				
+				// 1. Add the SVG to the page and employ #2
+				var svg = d3.select(".chart1").append("svg")
+				    .attr("width", width + margin.left + margin.right)
+				    .attr("height", height + margin.top + margin.bottom)
+				  .append("g")
+				    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				
+				// 3. Call the x axis in a group tag
+				svg.append("g")
+				    .attr("class", "x axis")
+				    .attr("transform", "translate(0," + height + ")")
+				    .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
+				
+				// 4. Call the y axis in a group tag
+				svg.append("g")
+				    .attr("class", "y axis")
+				    .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
+				
+				// 9. Append the path, bind the data, and call the line generator 
+				svg.append("path")
+				    .datum(dataset) // 10. Binds data to the line 
+				    .attr("class", "line") // Assign a class for styling 
+				    .attr("d", line); // 11. Calls the line generator 
+				
+				// 12. Appends a circle for each datapoint 
+				svg.selectAll(".dot")
+				    .data(dataset)
+				  .enter().append("circle") // Uses the enter().append() method
+				    .attr("class", "dot") // Assign a class for styling
+				    .attr("cx", function(d, i) { return xScale(i) })
+				    .attr("cy", function(d) { return yScale(d.y) })
+				    .attr("r", 5)
+				      .on("mouseover", function(a, b, c) { 
+				  			console.log(a) 
+				        this.attr('class', 'focus')
+						})
+				      .on("mouseout", function() {  })
+				//       .on("mousemove", mousemove);
+				
+				//   var focus = svg.append("g")
+				//       .attr("class", "focus")
+				//       .style("display", "none");
+				
+				//   focus.append("circle")
+				//       .attr("r", 4.5);
+				
+				//   focus.append("text")
+				//       .attr("x", 9)
+				//       .attr("dy", ".35em");
+				
+				//   svg.append("rect")
+				//       .attr("class", "overlay")
+				//       .attr("width", width)
+				//       .attr("height", height)
+				//       .on("mouseover", function() { focus.style("display", null); })
+				//       .on("mouseout", function() { focus.style("display", "none"); })
+				//       .on("mousemove", mousemove);
+				  
+				//   function mousemove() {
+				//     var x0 = x.invert(d3.mouse(this)[0]),
+				//         i = bisectDate(data, x0, 1),
+				//         d0 = data[i - 1],
+				//         d1 = data[i],
+				//         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+				//     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
+				//     focus.select("text").text(d);
+				//   }
+			</script>
+			
+          </div>
+        </div>
+        <div class="col-lg-6 order-lg-1">
+          <div class="p-5">
+            <h2 class="display-4">Chart 1</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-5 bg-black">
+    <div class="container">
+      <p class="m-0 text-center text-white small">Copyright &copy; Your Website 2019</p>
+    </div>
+    <!-- /.container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
